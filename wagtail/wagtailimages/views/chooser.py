@@ -116,6 +116,29 @@ def chooser(request):
 def image_chosen(request, image_id):
     image = get_object_or_404(get_image_model(), id=image_id)
 
+    if request.GET.get('allow_image_link'):
+        if image:
+            result = {
+                'url': image.file.url,
+                'title': image.title,
+            }
+        else:
+            result = {}
+        return render_modal_workflow(
+            request,
+            None, 'wagtailimages/chooser/image_chosen_for_link.js',
+            shared_context(request, {'result_json': json.dumps(result)})
+        )
+    return render_modal_workflow(
+        request,
+        None, 'wagtailimages/chooser/image_chosen.js',
+        shared_context(request, {'image_json': get_image_json(image)})
+    )
+
+
+def image_chosen_for_link(request, image_id):
+    image = get_object_or_404(get_image_model(), id=image_id)
+
     return render_modal_workflow(
         request,
         None, 'wagtailimages/chooser/image_chosen.js',

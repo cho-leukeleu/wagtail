@@ -22,6 +22,7 @@ def shared_context(request, extra_context=None):
         'parent_page_id': request.GET.get('parent_page_id'),
         'allow_external_link': request.GET.get('allow_external_link'),
         'allow_email_link': request.GET.get('allow_email_link'),
+        'allow_image_link': request.GET.get('allow_image_link'),
     }
     if extra_context:
         context.update(extra_context)

@@ -1,5 +1,11 @@
 {% load i18n %}
 function(modal) {
+    /* Set up link-types links to open in the modal */
+    $('.link-types a', modal.body).click(function() {
+        modal.loadUrl(this.href);
+        return false;
+    });
+
     var searchUrl = $('form.image-search', modal.body).attr('action');
 
     /* currentTag stores the tag currently being filtered on, so that we can

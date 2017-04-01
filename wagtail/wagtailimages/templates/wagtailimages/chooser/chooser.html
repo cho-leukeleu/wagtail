@@ -12,6 +12,8 @@
 
 <div class="tab-content">
     <section id="search" class="{% if not uploadform.errors %}active{% endif %} nice-padding">
+
+        {% include 'wagtailadmin/chooser/_link_types.html' with current='image' %}
         <form class="image-search search-bar" action="{% url 'wagtailimages:chooser' %}{% if will_select_format %}?select_format=true{% endif %}" method="GET" autocomplete="off" novalidate>
             <ul class="fields">
                 {% for field in searchform %}
@@ -36,6 +38,8 @@
     </section>
     {% if uploadform %}
         <section id="upload" class="{% if uploadform.errors %}active{% endif %} nice-padding">
+
+            {% include 'wagtailadmin/chooser/_link_types.html' with current='image' %}
             <form class="image-upload" action="{% url 'wagtailimages:chooser_upload' %}{% if will_select_format %}?select_format=true{% endif %}" method="POST" enctype="multipart/form-data" novalidate>
                 {% csrf_token %}
                 <ul class="fields">
