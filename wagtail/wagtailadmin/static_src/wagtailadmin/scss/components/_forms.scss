@@ -1078,6 +1078,36 @@ li.inline:first-child {
     }
 }
 
+/* LinkChooser */
+.link-chooser {
+    & .chosen {
+        & .title {
+            color: #333;
+            padding-left: 1em;
+            display: inline-block;
+        }
+        & .actions {
+            clear: both;
+            padding-top: 0.6em;
+        }
+        & input {
+            width: 100%;
+            color: #43b1b0;
+            font-family: Roboto Slab, Georgia, serif;
+            &:hover {
+                color: #246060;
+                &:after {
+                    background-color: black;
+                    color: white;
+                }
+            }
+        }
+    }
+    & .unchosen:before {
+        content: 'J';
+    }
+}
+
 // taggit tagging
 .tagit {
     padding: 0.6em 1.2em;

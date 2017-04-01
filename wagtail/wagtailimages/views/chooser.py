@@ -9,6 +9,7 @@ from wagtail.utils.pagination import paginate
 from wagtail.wagtailadmin.forms import SearchForm
 from wagtail.wagtailadmin.modal_workflow import render_modal_workflow
 from wagtail.wagtailadmin.utils import PermissionPolicyChecker, popular_tags_for_model
+from wagtail.wagtailadmin.views.chooser import shared_context
 from wagtail.wagtailcore import hooks
 from wagtail.wagtailcore.models import Collection
 from wagtail.wagtailimages import get_image_model
@@ -96,24 +97,29 @@ def chooser(request):
 
         paginator, images = paginate(request, images, per_page=12)
 
-        return render_modal_workflow(request, 'wagtailimages/chooser/chooser.html', 'wagtailimages/chooser/chooser.js', {
-            'images': images,
-            'uploadform': uploadform,
-            'searchform': searchform,
-            'is_searching': False,
-            'query_string': q,
-            'will_select_format': request.GET.get('select_format'),
-            'popular_tags': popular_tags_for_model(Image),
-            'collections': collections,
-        })
+        return render_modal_workflow(
+            request,
+            'wagtailimages/chooser/chooser.html', 'wagtailimages/chooser/chooser.js',
+            shared_context(request, {
+                'images': images,
+                'uploadform': uploadform,
+                'searchform': searchform,
+                'is_searching': False,
+                'query_string': q,
+                'will_select_format': request.GET.get('select_format'),
+                'popular_tags': popular_tags_for_model(Image),
+                'collections': collections,
+            })
+        )
 
 
 def image_chosen(request, image_id):
     image = get_object_or_404(get_image_model(), id=image_id)
 
     return render_modal_workflow(
-        request, None, 'wagtailimages/chooser/image_chosen.js',
-        {'image_json': get_image_json(image)}
+        request,
+        None, 'wagtailimages/chooser/image_chosen.js',
+        shared_context(request, {'image_json': get_image_json(image)})
     )
 
 
@@ -137,14 +143,17 @@ def chooser_upload(request):
             if request.GET.get('select_format'):
                 form = ImageInsertionForm(initial={'alt_text': image.default_alt_text})
                 return render_modal_workflow(
-                    request, 'wagtailimages/chooser/select_format.html', 'wagtailimages/chooser/select_format.js',
-                    {'image': image, 'form': form}
+                    request,
+                    'wagtailimages/chooser/select_format.html', 'wagtailimages/chooser/select_format.js',
+                    shared_context(request, {
+                        'image': image, 'form': form
+                    })
                 )
             else:
                 # not specifying a format; return the image details now
                 return render_modal_workflow(
                     request, None, 'wagtailimages/chooser/image_chosen.js',
-                    {'image_json': get_image_json(image)}
+                    shared_context(request, {'image_json': get_image_json(image)})
                 )
     else:
         form = ImageForm(user=request.user)
@@ -153,8 +162,13 @@ def chooser_upload(request):
     paginator, images = paginate(request, images, per_page=12)
 
     return render_modal_workflow(
-        request, 'wagtailimages/chooser/chooser.html', 'wagtailimages/chooser/chooser.js',
-        {'images': images, 'uploadform': form, 'searchform': searchform}
+        request,
+        'wagtailimages/chooser/chooser.html', 'wagtailimages/chooser/chooser.js',
+        shared_context(request, {
+            'images': images,
+            'uploadform': form,
+            'searchform': searchform
+        })
     )
 
 
@@ -185,7 +199,7 @@ def chooser_select_format(request, image_id):
 
             return render_modal_workflow(
                 request, None, 'wagtailimages/chooser/image_chosen.js',
-                {'image_json': image_json}
+                shared_context(request, {'image_json': image_json})
             )
     else:
         initial = {'alt_text': image.default_alt_text}
@@ -193,6 +207,10 @@ def chooser_select_format(request, image_id):
         form = ImageInsertionForm(initial=initial)
 
     return render_modal_workflow(
-        request, 'wagtailimages/chooser/select_format.html', 'wagtailimages/chooser/select_format.js',
-        {'image': image, 'form': form}
+        request,
+        'wagtailimages/chooser/select_format.html', 'wagtailimages/chooser/select_format.js',
+        shared_context(request, {
+            'image': image,
+            'form': form
+        })
     )

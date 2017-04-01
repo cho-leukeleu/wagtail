@@ -2,7 +2,9 @@ from __future__ import absolute_import, unicode_literals
 
 from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.urlresolvers import reverse
+from django.utils.html import format_html
 
 from wagtail.wagtailcore import hooks
 from wagtail.wagtailcore.models import PageViewRestriction
@@ -33,3 +35,13 @@ def check_view_restrictions(page, request, serve_args, serve_kwargs):
 
             elif restriction.restriction_type in [PageViewRestriction.LOGIN, PageViewRestriction.GROUPS]:
                 return require_wagtail_login(next=request.get_full_path())
+
+
+@hooks.register('insert_editor_js')
+def editor_js():
+    return format_html(
+        """
+            <script src="{0}"></script>
+        """,
+        static('wagtailadmin/js/link-chooser.js'),
+    )

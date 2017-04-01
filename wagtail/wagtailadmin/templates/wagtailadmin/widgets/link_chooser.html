@@ -1,0 +1,13 @@
+{% extends "wagtailadmin/widgets/chooser.html" %}
+
+{% block chooser_class %}link-chooser url_field{% endblock %}
+
+{% block chosen_state_view %}
+    <div class="input">
+        <input type="text"
+           class="full"
+           title="{{ link_url }}"
+           value="{{ link_text }}"
+           name="link_title"/>
+    </div>
+{% endblock %}

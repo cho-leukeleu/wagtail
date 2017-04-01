@@ -189,6 +189,42 @@ class AdminPageChooser(AdminChooser):
         )
 
 
+class AdminLinkChooser(AdminChooser):
+    choose_one_text = _('Add a link')
+    choose_another_text = _('Change this link')
+    show_edit_link = False
+
+    def render_html(self, name, value, attrs):
+        url, title = self.get_real_values('', '', value)
+
+        original_field_html = super(AdminLinkChooser, self).render_html(name, value, attrs)
+        return render_to_string("wagtailadmin/widgets/link_chooser.html", {
+            'widget': self,
+            'original_field_html': original_field_html,
+            'attrs': attrs,
+            'value': value,
+            'link_url': url,
+            'link_text': title,
+        })
+
+    def render_js_init(self, id_, name, value):
+        url, title = self.get_real_values(None, None, value)
+
+        return "createLinkChooser({id}, {url}, {title});".format(
+            id=json.dumps(id_),
+            url=json.dumps(url),
+            title=json.dumps(title),
+        )
+
+    def get_real_values(self, url, title, value):
+        if value:
+            instance = json.loads(value)
+            if isinstance(instance, dict):
+                url = instance.get('url')
+                title = instance.get('title')
+        return (url, title)
+
+
 @python_2_unicode_compatible
 @total_ordering
 class Button(object):
