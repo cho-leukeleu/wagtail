@@ -136,16 +136,6 @@ def image_chosen(request, image_id):
     )
 
 
-def image_chosen_for_link(request, image_id):
-    image = get_object_or_404(get_image_model(), id=image_id)
-
-    return render_modal_workflow(
-        request,
-        None, 'wagtailimages/chooser/image_chosen.js',
-        shared_context(request, {'image_json': get_image_json(image)})
-    )
-
-
 @permission_checker.require('add')
 def chooser_upload(request):
     Image = get_image_model()
@@ -162,8 +152,7 @@ def chooser_upload(request):
 
             # Reindex the image to make sure all tags are indexed
             search_index.insert_or_update_object(image)
-
-            if request.GET.get('select_format'):
+            if json.loads(request.GET.get('select_format')):
                 form = ImageInsertionForm(initial={'alt_text': image.default_alt_text})
                 return render_modal_workflow(
                     request,
@@ -173,6 +162,16 @@ def chooser_upload(request):
                     })
                 )
             else:
+                if json.loads(request.GET.get('allow_image_link')):
+                    result = {
+                        'url': image.file.url,
+                        'title': image.title,
+                    }
+                    return render_modal_workflow(
+                        request,
+                        None, 'wagtailimages/chooser/image_chosen_for_link.js',
+                        shared_context(request, {'result_json': json.dumps(result)})
+                    )
                 # not specifying a format; return the image details now
                 return render_modal_workflow(
                     request, None, 'wagtailimages/chooser/image_chosen.js',
