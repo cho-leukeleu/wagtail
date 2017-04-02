@@ -1,5 +1,11 @@
 {% load i18n %}
 function(modal) {
+    /* Set up link-types links to open in the modal */
+    $('.link-types a', modal.body).click(function() {
+        modal.loadUrl(this.href);
+        return false;
+    });
+
     function ajaxifyLinks (context) {
         $('a.document-choice', context).click(function() {
             modal.loadUrl(this.href);

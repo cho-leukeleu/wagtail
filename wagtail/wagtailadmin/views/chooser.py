@@ -23,6 +23,7 @@ def shared_context(request, extra_context=None):
         'allow_external_link': request.GET.get('allow_external_link'),
         'allow_email_link': request.GET.get('allow_email_link'),
         'allow_image_link': request.GET.get('allow_image_link'),
+        'allow_document_link': request.GET.get('allow_document_link'),
     }
     if extra_context:
         context.update(extra_context)

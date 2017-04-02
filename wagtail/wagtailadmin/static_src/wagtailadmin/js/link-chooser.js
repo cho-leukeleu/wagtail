@@ -16,6 +16,7 @@ function createLinkChooser(id, url, title) {
             'allow_external_link': true,
             'allow_email_link': true,
             'allow_image_link': true,
+            'allow_document_link': true,
             'can_choose_root': true,
             'link_text': title,
             'link_url': url

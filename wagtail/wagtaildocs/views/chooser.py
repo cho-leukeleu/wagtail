@@ -9,12 +9,14 @@ from wagtail.utils.pagination import paginate
 from wagtail.wagtailadmin.forms import SearchForm
 from wagtail.wagtailadmin.modal_workflow import render_modal_workflow
 from wagtail.wagtailadmin.utils import PermissionPolicyChecker
+from wagtail.wagtailadmin.views.chooser import shared_context
 from wagtail.wagtailcore import hooks
 from wagtail.wagtailcore.models import Collection
 from wagtail.wagtaildocs.forms import get_document_form
 from wagtail.wagtaildocs.models import get_document_model
 from wagtail.wagtaildocs.permissions import permission_policy
 from wagtail.wagtailsearch import index as search_index
+
 
 permission_checker = PermissionPolicyChecker(permission_policy)
 
@@ -83,21 +85,35 @@ def chooser(request):
         documents = documents.order_by('-created_at')
         paginator, documents = paginate(request, documents, per_page=10)
 
-        return render_modal_workflow(request, 'wagtaildocs/chooser/chooser.html', 'wagtaildocs/chooser/chooser.js', {
-            'documents': documents,
-            'uploadform': uploadform,
-            'searchform': searchform,
-            'collections': collections,
-            'is_searching': False,
-        })
+        return render_modal_workflow(
+            request,
+            'wagtaildocs/chooser/chooser.html', 'wagtaildocs/chooser/chooser.js',
+            shared_context(
+                request, {
+                    'documents': documents,
+                    'uploadform': uploadform,
+                    'searchform': searchform,
+                    'collections': collections,
+                    'is_searching': False,
+                }
+            )
+        )
 
 
 def document_chosen(request, document_id):
     document = get_object_or_404(get_document_model(), id=document_id)
+    
+    if json.loads(request.GET.get('allow_document_link')):
+        return render_modal_workflow(
+            request,
+            None, 'wagtaildocs/chooser/document_chosen_for_link.js',
+            shared_context(request, {'result_json': get_document_json(document)})
+        )
 
     return render_modal_workflow(
-        request, None, 'wagtaildocs/chooser/document_chosen.js',
-        {'document_json': get_document_json(document)}
+        request,
+        None, 'wagtaildocs/chooser/document_chosen.js',
+        shared_context(request, {'document_json': get_document_json(document)})
     )
 
 
@@ -116,9 +132,17 @@ def chooser_upload(request):
             # Reindex the document to make sure all tags are indexed
             search_index.insert_or_update_object(document)
 
+            if json.loads(request.GET.get('allow_document_link')):
+                return render_modal_workflow(
+                    request,
+                    None, 'wagtaildocs/chooser/document_chosen_for_link.js',
+                    shared_context(request, {'result_json': get_document_json(document)})
+                )
+
             return render_modal_workflow(
-                request, None, 'wagtaildocs/chooser/document_chosen.js',
-                {'document_json': get_document_json(document)}
+                request,
+                None, 'wagtaildocs/chooser/document_chosen.js',
+                shared_context(request, {'document_json': get_document_json(document)})
             )
     else:
         form = DocumentForm(user=request.user)
@@ -126,6 +150,7 @@ def chooser_upload(request):
     documents = Document.objects.order_by('title')
 
     return render_modal_workflow(
-        request, 'wagtaildocs/chooser/chooser.html', 'wagtaildocs/chooser/chooser.js',
-        {'documents': documents, 'uploadform': form}
+        request,
+        'wagtaildocs/chooser/chooser.html', 'wagtaildocs/chooser/chooser.js',
+        shared_context(request, {'documents': documents, 'uploadform': form})
     )

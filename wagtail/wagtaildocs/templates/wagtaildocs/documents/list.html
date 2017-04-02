@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n wagtailadmin_tags %}
 <table class="listing">
     <col />
     <col  />
@@ -31,7 +31,7 @@
             <tr>
                 <td class="title">
                     {% if choosing %}
-                        <h2><a href="{% url 'wagtaildocs:document_chosen' doc.id %}" class="document-choice">{{ doc.title }}</a></h2>
+                        <h2><a href="{% url 'wagtaildocs:document_chosen' doc.id %}{% querystring %}" class="document-choice">{{ doc.title }}</a></h2>
                     {% else %}
                         <h2><a href="{% url 'wagtaildocs:edit' doc.id %}">{{ doc.title }}</a></h2>
                     {% endif %}

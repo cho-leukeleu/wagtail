@@ -1,5 +1,5 @@
 {% load i18n wagtailadmin_tags %}
-{% if allow_external_link or allow_email_link or allow_image_link or current == 'external' or current == 'email' or current == 'image' %}
+{% if allow_external_link or allow_email_link or allow_image_link or allow_document_link or current == 'external' or current == 'email' or current == 'image' or current == 'document' %}
     <p class="link-types">
         {% if current == 'internal' %}
             <b>{% trans "Internal link" %}</b>
@@ -27,6 +27,12 @@
             | <b>{% trans "Image link" %}</b>
         {% elif allow_image_link %}
             | <a href="{% url 'wagtailimages:chooser' %}{% querystring p=None parent_page_id=parent_page_id %}">{% trans "Image link" %}</a>
+        {% endif %}
+
+        {% if current == 'document' %}
+            | <b>{% trans "Document link" %}</b>
+        {% elif allow_document_link %}
+            | <a href="{% url 'wagtaildocs:chooser' %}{% querystring p=None parent_page_id=parent_page_id %}">{% trans "Document link" %}</a>
         {% endif %}
     </p>
 {% endif %}
