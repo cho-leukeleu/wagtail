@@ -102,8 +102,8 @@ def chooser(request):
 
 def document_chosen(request, document_id):
     document = get_object_or_404(get_document_model(), id=document_id)
-    
-    if json.loads(request.GET.get('allow_document_link')):
+
+    if request.GET.get('allow_document_link', default=False) == 'true':
         return render_modal_workflow(
             request,
             None, 'wagtaildocs/chooser/document_chosen_for_link.js',
@@ -132,7 +132,7 @@ def chooser_upload(request):
             # Reindex the document to make sure all tags are indexed
             search_index.insert_or_update_object(document)
 
-            if json.loads(request.GET.get('allow_document_link')):
+            if request.GET.get('allow_document_link', default=False) == 'true':
                 return render_modal_workflow(
                     request,
                     None, 'wagtaildocs/chooser/document_chosen_for_link.js',

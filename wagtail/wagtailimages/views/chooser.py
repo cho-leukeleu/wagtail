@@ -116,7 +116,7 @@ def chooser(request):
 def image_chosen(request, image_id):
     image = get_object_or_404(get_image_model(), id=image_id)
 
-    if request.GET.get('allow_image_link'):
+    if request.GET.get('allow_image_link', default=False) == True:
         if image:
             result = {
                 'url': image.file.url,
@@ -152,7 +152,7 @@ def chooser_upload(request):
 
             # Reindex the image to make sure all tags are indexed
             search_index.insert_or_update_object(image)
-            if json.loads(request.GET.get('select_format')):
+            if request.GET.get('select_format', default=False) == 'true':
                 form = ImageInsertionForm(initial={'alt_text': image.default_alt_text})
                 return render_modal_workflow(
                     request,
@@ -162,7 +162,7 @@ def chooser_upload(request):
                     })
                 )
             else:
-                if json.loads(request.GET.get('allow_image_link')):
+                if request.GET.get('allow_image_link', default=False) == 'true':
                     result = {
                         'url': image.file.url,
                         'title': image.title,
